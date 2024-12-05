@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edukasi</title>
+    <link rel="stylesheet" href="edukasi.css"> <!-- Link ke file CSS -->
+    <!-- Firebase Libraries -->
+    <script type="module">
+        // Import Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js";
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAq1nKP3DObMbxxNHi3f1y6yEmAxZV-nfA",
+            authDomain: "pilketos24.firebaseapp.com",
+            databaseURL: "https://pilketos24-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "pilketos24",
+            storageBucket: "pilketos24.firebasestorage.app",
+            messagingSenderId: "439227857159",
+            appId: "1:439227857159:web:1bdc12a9fb6886c9e7eda2",
+            measurementId: "G-JHMWN0YWDP"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Load Books from Firebase
+        document.addEventListener("DOMContentLoaded", async () => {
+            const bookListElement = document.getElementById('book-list');
+            const booksRef = ref(database, 'books2');
+
+            try {
+                const snapshot = await get(booksRef);
+
+                if (snapshot.exists()) {
+                    const books = snapshot.val();
+
+                    for (let bookId in books) {
+                        const book = books[bookId];
+
+                        // Create book card
+                        const bookCard = document.createElement('div');
+                        bookCard.classList.add('book-card');
+
+                        // Book cover
+                        const bookImage = document.createElement('img');
+                        bookImage.src = book.imageUrl;
+                        bookImage.alt = book.title;
+
+                        // Book title
+                        const bookTitle = document.createElement('h3');
+                        bookTitle.textContent = book.title;
+
+                        // Book author
+                        const bookAuthor = document.createElement('p');
+                        bookAuthor.textContent = "Penulis: " + book.author;
+
+                        // PDF button
+                        const viewPdfButton = document.createElement('a');
+                        viewPdfButton.href = book.pdfUrl;
+                        viewPdfButton.target = "_blank";
+                        viewPdfButton.textContent = "Buka PDF";
+                        viewPdfButton.classList.add('view-pdf-btn');
+
+                        // Append elements to book card
+                        bookCard.appendChild(bookImage);
+                        bookCard.appendChild(bookTitle);
+                        bookCard.appendChild(bookAuthor);
+                        bookCard.appendChild(viewPdfButton);
+
+                        // Append book card to book list
+                        bookListElement.appendChild(bookCard);
+                    }
+                } else {
+                    bookListElement.textContent = "Tidak ada data buku ditemukan.";
+                }
+            } catch (error) {
+                console.error("Error fetching books: ", error);
+                bookListElement.textContent = "Terjadi kesalahan saat memuat data.";
+            }
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Daftar Buku Edukasi</h1>
+    </header>
+
+    <section id="book-list" class="book-list">
+        <!-- Buku akan dimuat di sini -->
+    </section>
+</body>
+</html>
